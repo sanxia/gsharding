@@ -2,6 +2,7 @@ package gsharding
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 )
 
@@ -41,7 +42,8 @@ func (s *DefaultShardingRule) GetDatabaseName() string {
 			shardingFieldValue := s.GetShardingFieldValue(true)
 
 			shardingCount := uint64(s.Sharding.GetDatabaseShardingCount()) * uint64(s.Sharding.GetTableShardingCount())
-			shardingIndex := int32(shardingFieldValue % shardingCount / uint64(s.Sharding.GetDatabaseShardingCount()))
+			//shardingIndex := int32(shardingFieldValue % shardingCount / uint64(s.Sharding.GetDatabaseShardingCount()))
+			shardingIndex := int32(shardingFieldValue / shardingCount % uint64(s.Sharding.GetDatabaseShardingCount()))
 
 			databaseName = fmt.Sprintf("%s-%d", databaseName, shardingIndex)
 		}
@@ -138,6 +140,7 @@ func (s *DefaultShardingRule) GetShardingFieldValue(isDatabase bool) uint64 {
 				shardingFieldValue = uint64(int64Value)
 			} else {
 				shardingFieldValue = glib.Hash(fieldValue.(string))
+				log.Printf("ShardingRule fieldName: %s, fieldValue: %s, fieldValueHash: %d", shardingFieldName, fieldValue.(string), shardingFieldValue)
 			}
 		}
 	}
